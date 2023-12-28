@@ -14,9 +14,9 @@ const passwordSchema = new Schema<TPassword>({
 });
 export const userSchema = new Schema<TUser>({
   name: { type: String, required: true, trim: true },
-  email: { type: String, required: true, trim: true },
-  password: { type: String, required: true, trim: true },
-  passwordChangedAt: { type: Date, required: true, trim: true },
+  email: { type: String, required: true, trim: true, unique: true },
+  password: { type: String, required: true, trim: true, default: null },
+  passwordChangedAt: { type: Date, trim: true, select: 0 },
   passwordHistory: [passwordSchema],
   photo: { type: String, trim: true },
   role: { type: String, enum: Object.values(USER_ROLE), default: 'user', required: true },
