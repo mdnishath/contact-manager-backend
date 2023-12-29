@@ -15,21 +15,21 @@ const passwordSchema = new Schema<TPassword>({
 export const userSchema = new Schema<TUser, UserModel>({
   name: { type: String, required: true, trim: true },
   email: { type: String, required: true, trim: true, unique: true },
-  password: { type: String, required: true, trim: true, default: null },
-  passwordChangedAt: { type: Date, trim: true, select: 0 },
-  passwordHistory: [passwordSchema],
+  password: { type: String, required: true, trim: true, select: 0 },
+  passwordChangedAt: { type: Date, trim: true, select: 0, default: null },
+  passwordHistory: { type: [passwordSchema], select: 0 },
   photo: { type: String, trim: true },
   role: { type: String, enum: Object.values(USER_ROLE), default: 'user', required: true },
   userStatus: { type: String, enum: Object.values(USER_STATUS), default: 'active', required: true },
 });
 
-userSchema.set('toJSON', {
-  transform: (doc, ret) => {
-    delete ret.password;
-    delete ret.passwordHistory;
-    return ret;
-  },
-});
+// userSchema.set('toJSON', {
+//   transform: (doc, ret) => {
+//     delete ret.password;
+//     delete ret.passwordHistory;
+//     return ret;
+//   },
+// });
 
 userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
   passwordChangedTimestamp: Date,

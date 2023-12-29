@@ -6,7 +6,12 @@ import { TUser } from '../User/user.interface';
 import { TLogin } from './auth.interface';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
-import { JWT_ACCESS_SECRET, JWT_ACCESS_SECRET_EXPAIR_IN, PASSWORD_SALT } from '../../config';
+import {
+  JWT_ACCESS_SECRET,
+  JWT_ACCESS_SECRET_EXPAIR_IN,
+  JWT_REFRESH_SECRET_EXPAIR_IN,
+  PASSWORD_SALT,
+} from '../../config';
 import { JwtPayload } from 'jsonwebtoken';
 import { createToken } from '../../utils/createTocken';
 
@@ -23,7 +28,7 @@ const register = async (payload: TRegister): Promise<TUser | null> => {
 };
 
 //lohin user
-const login = async (payload: TLogin): Promise<string> => {
+const login = async (payload: TLogin) => {
   const user = await User.findOne({ email: payload.email }).select('+password');
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user does not exist');
@@ -51,7 +56,15 @@ const login = async (payload: TLogin): Promise<string> => {
     JWT_ACCESS_SECRET,
     JWT_ACCESS_SECRET_EXPAIR_IN,
   );
-  return accessToken;
+  const refreshToken = await createToken(
+    loginPayload,
+    JWT_ACCESS_SECRET,
+    JWT_REFRESH_SECRET_EXPAIR_IN,
+  );
+  return {
+    accessToken,
+    refreshToken,
+  };
 };
 
 export const AuthServices = {
