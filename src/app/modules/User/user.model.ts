@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { TUser, TPassword } from './user.interface';
+import { TUser, TPassword, UserModel } from './user.interface';
 import { USER_ROLE, USER_STATUS } from './user.constants';
 const passwordSchema = new Schema<TPassword>({
   password: {
@@ -12,7 +12,7 @@ const passwordSchema = new Schema<TPassword>({
     default: Date.now,
   },
 });
-export const userSchema = new Schema<TUser>({
+export const userSchema = new Schema<TUser, UserModel>({
   name: { type: String, required: true, trim: true },
   email: { type: String, required: true, trim: true, unique: true },
   password: { type: String, required: true, trim: true, default: null },
@@ -31,4 +31,11 @@ userSchema.set('toJSON', {
   },
 });
 
-export const User = model<TUser>('User', userSchema);
+userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
+  passwordChangedTimestamp: Date,
+  jwtIssuedTimestamp: number,
+) {
+  const passwordChangedTime = new Date(passwordChangedTimestamp).getTime() / 1000;
+  return passwordChangedTime > jwtIssuedTimestamp;
+};
+export const User = model<TUser, UserModel>('User', userSchema);

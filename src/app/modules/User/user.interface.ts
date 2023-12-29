@@ -1,3 +1,4 @@
+import { Model } from 'mongoose';
 import { USER_ROLE, USER_STATUS } from './user.constants';
 
 //password type
@@ -18,3 +19,12 @@ export type TUser = {
   role: TUserRole;
   userStatus: TUserStatus;
 };
+export interface UserModel extends Model<TUser> {
+  //instance methods for checking if the user exist
+  // isUserExistsByCustomId(id: string): Promise<TUser>;
+  //instance methods for checking if passwords are matched
+  isJWTIssuedBeforePasswordChanged(
+    passwordChangedTimestamp: Date,
+    jwtIssuedTimestamp: number,
+  ): boolean;
+}
