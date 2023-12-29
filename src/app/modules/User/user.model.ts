@@ -23,4 +23,12 @@ export const userSchema = new Schema<TUser>({
   userStatus: { type: String, enum: Object.values(USER_STATUS), default: 'active', required: true },
 });
 
+userSchema.set('toJSON', {
+  transform: (doc, ret) => {
+    delete ret.password;
+    delete ret.passwordHistory;
+    return ret;
+  },
+});
+
 export const User = model<TUser>('User', userSchema);
