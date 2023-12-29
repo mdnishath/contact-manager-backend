@@ -1,4 +1,4 @@
-import { Hashed } from '../../utils/Hashed';
+import { Hashly } from '../../utils/Hashed';
 import { User } from '../User/user.model';
 import { TRegister } from './auth.constants';
 
@@ -10,7 +10,7 @@ import { PASSWORD_SALT } from '../../config';
 
 // register user
 const register = async (payload: TRegister): Promise<TUser | null> => {
-  const hashedPassword = await Hashed.hashPassword(
+  const hashedPassword = await Hashly.hashPassword(
     payload.password as string,
     PASSWORD_SALT.toString(),
   );
@@ -31,13 +31,13 @@ const login = async (payload: TLogin) => {
   }
   console.log(payload.password, user.password, PASSWORD_SALT.toString());
 
-  const isPasswordMatched = await Hashed.verifyPassword(
+  const isPasswordMatched = await Hashly.verifyPassword(
     payload.password,
     user.password,
     PASSWORD_SALT.toString(),
   );
   console.log(isPasswordMatched);
-  return null;
+  return 'You are now authenticated';
 };
 
 export const AuthServices = {

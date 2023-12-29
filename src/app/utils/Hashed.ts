@@ -4,7 +4,7 @@ import { promisify } from 'util';
 // const randomBytesAsync = promisify(crypto.randomBytes);
 const pbkdf2Async = promisify(crypto.pbkdf2);
 
-export class Hashed {
+export class Hashly {
   static async hashPassword(password: string, salt: string): Promise<string> {
     const hashedPasswordBuffer = await pbkdf2Async(password, salt, 10000, 32, 'sha256');
     const hashedPassword = hashedPasswordBuffer.toString('hex');
