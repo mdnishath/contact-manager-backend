@@ -5,6 +5,8 @@ import { TErrorResponse } from '../app/interface/TErrorResponse';
 import { errorProcess } from '../app/helpers/errorHelpers/errorProcess';
 
 const globalErrorHandler = (error: any, req: Request, res: Response, next: NextFunction) => {
+  // console.log(error);
+
   let errorResponse: TErrorResponse = {
     statusCode: error.statusCode || 500,
     status: error.status || 'error',

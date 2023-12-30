@@ -3,10 +3,11 @@ import { catchAsync } from '../app/utils/catchAsync';
 import { TUserRole } from '../app/modules/User/user.interface';
 import AppError from '../app/errors/AppError';
 import httpStatus from 'http-status';
-import { verifyToken } from '../app/utils/createTocken';
+
 import { JWT_ACCESS_SECRET } from '../app/config';
 import { JwtPayload } from 'jsonwebtoken';
 import { User } from '../app/modules/User/user.model';
+import { verifyToken } from '../app/utils/verifyToken';
 
 export const auth = (...roles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -14,7 +15,7 @@ export const auth = (...roles: TUserRole[]) => {
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
     }
-    const decoded = (await verifyToken(token, JWT_ACCESS_SECRET)) as JwtPayload;
+    const decoded = await verifyToken(token, JWT_ACCESS_SECRET);
     const { email, iat } = decoded;
 
     const user = await User.findOne({ email: email });
