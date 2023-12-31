@@ -5,3 +5,8 @@ export type TLogin = {
   email: string;
   password: string;
 };
+
+export type TChanagePassword = {
+  oldPassword: string;
+  newPassword: string;
+};

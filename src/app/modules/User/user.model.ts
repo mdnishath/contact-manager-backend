@@ -1,6 +1,8 @@
 import { Schema, model } from 'mongoose';
 import { TUser, TPassword, UserModel } from './user.interface';
 import { USER_ROLE, USER_STATUS } from './user.constants';
+import AppError from '../../errors/AppError';
+import httpStatus from 'http-status';
 const passwordSchema = new Schema<TPassword>({
   password: {
     type: String,
@@ -30,6 +32,14 @@ export const userSchema = new Schema<TUser, UserModel>({
 //     return ret;
 //   },
 // });
+
+userSchema.statics.isUserExists = async function (email: string) {
+  const isUserExists = await this.findOne({ email });
+  if (!isUserExists) {
+    throw new AppError(httpStatus.NOT_FOUND, `User ${email} does not exist`);
+  }
+  return isUserExists;
+};
 
 userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
   passwordChangedTimestamp: Date,

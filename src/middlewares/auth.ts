@@ -16,6 +16,8 @@ export const auth = (...roles: TUserRole[]) => {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
     }
     const decoded = await verifyToken(token, JWT_ACCESS_SECRET);
+    // console.log(decoded);
+
     const { email, iat } = decoded;
 
     const user = await User.findOne({ email: email });

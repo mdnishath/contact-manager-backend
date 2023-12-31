@@ -10,3 +10,8 @@ export const refreshValidationSchema = z.object({
     required_error: 'Refresh token is required!',
   }),
 });
+
+export const changePasswordValidationSchema = z.object({
+  oldPassword: z.string(),
+  newPassword: z.string().min(6),
+});

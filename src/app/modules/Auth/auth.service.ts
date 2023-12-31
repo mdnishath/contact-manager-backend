@@ -3,7 +3,7 @@ import { User } from '../User/user.model';
 import { TRegister } from './auth.constants';
 
 import { TUser } from '../User/user.interface';
-import { TLogin } from './auth.interface';
+import { TChanagePassword, TLogin } from './auth.interface';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import {
@@ -23,7 +23,9 @@ const register = async (payload: TRegister): Promise<TUser | null> => {
     payload.password as string,
     PASSWORD_SALT.toString(),
   );
+  payload.passwordHistory = [];
   payload.password = hashedPassword;
+  payload.passwordHistory.push({ password: hashedPassword, timestamp: new Date() });
   const user = await User.create({ ...payload, role: 'user' });
 
   return user;
@@ -68,6 +70,77 @@ const login = async (payload: TLogin) => {
   };
 };
 
+// change password
+const changePassword = async (
+  userData: JwtPayload,
+  payload: TChanagePassword,
+): Promise<TUser | null> => {
+  // console.log(userData);
+
+  if (!userData) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Unauthorized User');
+  }
+  const { email } = userData;
+  const user = await User.findOne({ email }).select('+password +passwordHistory');
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User does not exist');
+  }
+
+  if (!payload.oldPassword && !payload.newPassword) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'old password and new password required');
+  }
+  // check if password match
+  const oldPachewordMatch = await Hashly.verifyPassword(
+    payload.oldPassword,
+    user.password,
+    PASSWORD_SALT.toString(),
+  );
+
+  if (oldPachewordMatch) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Wrong password');
+  }
+  const newPachewordMatch = await Hashly.verifyPassword(
+    payload.newPassword,
+    user.password,
+    PASSWORD_SALT.toString(),
+  );
+  if (newPachewordMatch) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Try another password');
+  }
+  const newHashedPassword = await Hashly.hashPassword(
+    payload.newPassword as string,
+    PASSWORD_SALT.toString(),
+  );
+
+  for (const obj of user.passwordHistory) {
+    if (newHashedPassword === user.password) {
+      throw new AppError(
+        400,
+        `Password change failed. Ensure the new password is unique and not among the last 2 used (last used on ${obj.timestamp
+          .toLocaleString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: true,
+          })
+          .replace(/\//g, '-')}).`,
+      );
+    }
+  }
+
+  user.passwordHistory.unshift({ password: newHashedPassword, timestamp: new Date() });
+  const updatedUser = await User.findByIdAndUpdate(
+    user._id,
+    {
+      password: newHashedPassword,
+      passwordHistory: user.passwordHistory,
+    },
+    { new: true },
+  );
+  return updatedUser;
+};
 //create refresh token
 const refreshToken = async (token: string): Promise<string> => {
   const decoded = (await verifyToken(token, JWT_REFRESH_SECRET)) as JwtPayload;
@@ -100,4 +173,5 @@ export const AuthServices = {
   register,
   login,
   refreshToken,
+  changePassword,
 };
