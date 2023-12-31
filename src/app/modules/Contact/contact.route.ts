@@ -11,5 +11,6 @@ router.post(
   validateRequest(createContactValidationSchema),
   ContactControllers.createContact,
 );
+router.get('/', auth('user'), ContactControllers.getContacts);
 
 export const ContactRoutes = router;

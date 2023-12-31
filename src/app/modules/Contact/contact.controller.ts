@@ -16,6 +16,20 @@ const createContact = catchAsync(async (req, res) => {
   });
 });
 
+//get contacts
+const getContacts = catchAsync(async (req, res) => {
+  const userData = req.user;
+  const query = req.query;
+  //call service
+  const result = await ContactServices.getContacts(userData, query);
+  sendSuccessResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Contacts retrived successfully',
+    data: result,
+  });
+});
+
 export const ContactControllers = {
   createContact,
+  getContacts,
 };

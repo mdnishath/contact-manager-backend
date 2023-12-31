@@ -12,7 +12,7 @@ class QueryBuilder<T> {
     const queryObject = { ...this.query };
     // Get the list of field names from the model schema
     const schemaFields = Object.keys(this.modelQuery.model.schema.paths);
-    console.log(queryObject, schemaFields);
+    // console.log(queryObject, schemaFields);
 
     // Exclude fields that are not present in the schema
     Object.keys(queryObject).forEach((field) => {
@@ -26,7 +26,7 @@ class QueryBuilder<T> {
     return this;
   }
   search() {
-    if (this.query?.searchTerm) {
+    if (this.query?.search) {
       const fieldValues = Object.values(this.modelQuery.model.schema.paths);
       const searchableFields = fieldValues
         .filter((fieldObj) => {
@@ -37,7 +37,7 @@ class QueryBuilder<T> {
         .map(
           (fieldObj) =>
             ({
-              [fieldObj.path]: { $regex: this.query.searchTerm, $options: 'i' },
+              [fieldObj.path]: { $regex: this.query.search, $options: 'i' },
             }) as FilterQuery<T>,
         );
       console.log(searchableFields);
