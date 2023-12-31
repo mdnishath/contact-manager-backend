@@ -33,10 +33,10 @@ export const userSchema = new Schema<TUser, UserModel>({
 //   },
 // });
 
-userSchema.statics.isUserExists = async function (email: string) {
-  const isUserExists = await this.findOne({ email });
+userSchema.statics.isUserExists = async function (id: Schema.Types.ObjectId) {
+  const isUserExists = await this.findById(id);
   if (!isUserExists) {
-    throw new AppError(httpStatus.NOT_FOUND, `User ${email} does not exist`);
+    throw new AppError(httpStatus.NOT_FOUND, `User ${id} does not exist`);
   }
   return isUserExists;
 };

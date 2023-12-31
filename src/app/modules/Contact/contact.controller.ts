@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import { catchAsync } from '../../utils/catchAsync';
 import { sendSuccessResponse } from '../../utils/sendSuccessResponse';
 import { ContactServices } from './contsct.service';
+import mongoose from 'mongoose';
 
 //create contact
 const createContact = catchAsync(async (req, res) => {
@@ -29,7 +30,22 @@ const getContacts = catchAsync(async (req, res) => {
   });
 });
 
+const updateContact = catchAsync(async (req, res) => {
+  const payload = await req.body;
+  const userData = req.user;
+  const id = new mongoose.Types.ObjectId(req.params.id);
+
+  // call service
+  const result = await ContactServices.updateContact(userData, payload, id);
+  sendSuccessResponse(res, {
+    statusCode: httpStatus.OK,
+    message: 'Contact updated succesfully',
+    data: result,
+  });
+});
+
 export const ContactControllers = {
   createContact,
   getContacts,
+  updateContact,
 };

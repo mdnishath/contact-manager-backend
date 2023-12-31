@@ -64,6 +64,7 @@ const login = async (payload: TLogin) => {
     throw new AppError(httpStatus.BAD_REQUEST, 'Invalid password');
   }
   const loginPayload = {
+    id: user?._id,
     email: user?.email,
     role: user?.role,
   } as JwtPayload;
@@ -94,8 +95,8 @@ const changePassword = async (
   if (!userData) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'Unauthorized User');
   }
-  const { email } = userData;
-  const user = await User.findOne({ email }).select('+password +passwordHistory');
+  const { id } = userData;
+  const user = await User.findById(id).select('+password +passwordHistory');
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User does not exist');
   }
@@ -159,8 +160,8 @@ const changePassword = async (
 const refreshToken = async (token: string): Promise<string> => {
   const decoded = (await verifyToken(token, JWT_REFRESH_SECRET)) as JwtPayload;
 
-  const { email, iat } = decoded;
-  const user = await User.findOne({ email: email });
+  const { id, iat } = decoded;
+  const user = await User.findById(id);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
   }
@@ -175,6 +176,7 @@ const refreshToken = async (token: string): Promise<string> => {
     throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized !');
   }
   const jwtPayload = {
+    id: user._id,
     email: user.email,
     role: user.role,
   };

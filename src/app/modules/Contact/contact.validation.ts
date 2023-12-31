@@ -13,3 +13,11 @@ export const createContactValidationSchema = z.object({
     country: z.string().trim().min(1).max(30),
   }),
 });
+export const updateContactValidationSchema = z.object({
+  body: z.object({
+    name: nameSchema.partial(),
+    email: z.string().email().optional(),
+    phone: z.string().trim().min(1).max(15).optional(),
+    country: z.string().trim().min(1).max(30).optional(),
+  }),
+});

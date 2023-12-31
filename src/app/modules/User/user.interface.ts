@@ -1,4 +1,4 @@
-import { Document, Model } from 'mongoose';
+import { Document, Model, Types } from 'mongoose';
 import { USER_ROLE, USER_STATUS } from './user.constants';
 
 //password type
@@ -21,7 +21,7 @@ export interface TUser extends Document {
 }
 export interface UserModel extends Model<TUser> {
   //instance methods for checking if the user exist
-  isUserExists(email: string): Promise<TUser>;
+  isUserExists(id: Types.ObjectId): Promise<TUser>;
   //instance methods for checking if passwords are matched
   isJWTIssuedBeforePasswordChanged(
     passwordChangedTimestamp: Date,
