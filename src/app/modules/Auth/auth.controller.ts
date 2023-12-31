@@ -15,6 +15,17 @@ const register = catchAsync(async (req, res) => {
     data: user,
   });
 });
+//create user
+const createUser = catchAsync(async (req, res) => {
+  const payload = await req.body;
+  //call auth service
+  const user = await AuthServices.createUser(payload);
+  sendSuccessResponse(res, {
+    statusCode: httpStatus.CREATED,
+    message: 'User registered successfully',
+    data: user,
+  });
+});
 
 // login controler
 const login = catchAsync(async (req, res) => {
@@ -61,6 +72,7 @@ const refreshToken = catchAsync(async (req, res) => {
 
 export const AuthControllers = {
   register,
+  createUser,
   login,
   refreshToken,
   changePassword,

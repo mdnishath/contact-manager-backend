@@ -19,6 +19,8 @@ import { verifyToken } from '../../utils/verifyToken';
 
 // register user
 const register = async (payload: TRegister): Promise<TUser | null> => {
+  console.log(payload);
+
   const hashedPassword = await Hashly.hashPassword(
     payload.password as string,
     PASSWORD_SALT.toString(),
@@ -26,7 +28,19 @@ const register = async (payload: TRegister): Promise<TUser | null> => {
   payload.passwordHistory = [];
   payload.password = hashedPassword;
   payload.passwordHistory.push({ password: hashedPassword, timestamp: new Date() });
-  const user = await User.create({ ...payload, role: 'user' });
+  const user = await User.create(payload);
+
+  return user;
+};
+const createUser = async (payload: TRegister): Promise<TUser | null> => {
+  const hashedPassword = await Hashly.hashPassword(
+    payload.password as string,
+    PASSWORD_SALT.toString(),
+  );
+  payload.passwordHistory = [];
+  payload.password = hashedPassword;
+  payload.passwordHistory.push({ password: hashedPassword, timestamp: new Date() });
+  const user = await User.create({ ...payload, role: 'admin' });
 
   return user;
 };
@@ -171,6 +185,7 @@ const refreshToken = async (token: string): Promise<string> => {
 
 export const AuthServices = {
   register,
+  createUser,
   login,
   refreshToken,
   changePassword,
